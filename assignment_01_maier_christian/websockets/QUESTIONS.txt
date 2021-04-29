@@ -1,0 +1,9 @@
+Please answer the following questions:
+
+For real-time chat applications
+    1) what are advantages and disadvantages of using HTTP?  (name at least two each)
+    2) what are advantages and disadvantages of using WebSockets? (name at least two each)
+
+Hint: you do not only have to focus on technical aspects.
+
+Please put your answers in a file called ANSWERS.txt
