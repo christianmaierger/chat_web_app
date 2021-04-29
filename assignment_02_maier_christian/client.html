@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Chat</title>
+
+    <!-- The client.css stylesheet and the external font-awesome (https://fontawesome.com/) ressource for the icons -->
+    <link rel="stylesheet" href="styles/client.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+</head>
+
+<body>
+
+    <!-- Header, not important for the assignment -->
+    <header>
+        <div class="header-item">
+            <h2>KS-B Assignments</h2>
+            <h1>Simple Text Chat</h1>
+        </div>
+        <div class="header-item">
+            <img src="img/logo_mci_hci_200x96.png">
+        </div>
+    </header>
+
+    <!-- First section, including the chatname input and join chat button. Note the uniq ID assigned to each item! -->
+    <div class="card">
+        <label for="chatname"><i class="far fa-user"></i> Name</label>
+        <input id="chatname" type="text" placeholder="Enter your name">
+        <button id="btnJoin"><i class="fas fa-sign-in-alt"></i> Join Chat</button>
+    </div>
+
+    <!-- Second section, including the textarea for the chat messages and the chat members list. Again, note the uniq ID assigned to each item! -->
+    <div class="card grid">
+        <textarea name="chat" id="chat" cols="30" rows="16" readonly></textarea>
+        <div class="chatmembers">
+            <h3>Current members:</h3>
+            <ul id="memberList">
+                <li>Mister X</li>
+                <li>Mary Jane</li>
+                <li>Peter Pan</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Third and last section, including the input for sending a message and the regarding button. Again, note the uniq ID assigned to each item! -->
+    <div class="card">
+        <label><i class="far fa-comment-alt"></i> Message</label>
+        <input id="message" type="text" placeholder="Enter your message">
+        <button><i class="far fa-paper-plane"></i> Send message</button>
+    </div>
+    <script src="scripts/client.js">
+    </script>
+
+
+</body>
+
+</html>

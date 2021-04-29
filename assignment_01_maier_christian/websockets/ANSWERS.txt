@@ -1,0 +1,60 @@
+For real-time chat applications
+    1) what are advantages and disadvantages of using HTTP?  (name at least two each)
+   
+    Advantages of HTTP:
+    The protocoll is very flexible in handling different media types and applications and often in a chat a user wants to share a song, video,
+    meme or some other media type with his peers. HTTP handels that well as it has the capabillity to download extensions and plugins
+    to handle most formats and also external viewers can be used.
+
+    
+    HTTP is a protocol where only smaller chunks of data are transferred with each connection, as the protocoll relies on
+    always opening new connections for a response and request pair. So the transfered data is mostly just elemnts of a page or data to be 
+    stored on a server endpoint etc. So the probability of intercepting data is tuned down quite a bit.
+
+    What is mainly a disadvantage for security reasons might also be seen as an advantage for new developers, as the messages between
+    server and client are strings/ human readable text, this might be way easier for someone starting out. 
+    Also there are other complex types of working with distributed systems, for example facebook in parts using an actor system,
+    that is not so easy to understand/implement for starters I guess.
+   
+
+    Disadvantages of HTTP:
+    The biggest technical disadvantage I can think of, is that inherently HTTP is not really made
+    for server push as it is stateless and inherently relies on the client to steadily request data from the server,
+    so called polling. Also as http is stateless we would need things like a session management/cookies to keep
+    the chats and other data associated to one client and to keep them loged in.
+
+    Also the nature of always closing and reopening connection will cause quite some overhead that potentially can harm the performance of our application.
+    This is espeaccialy true for a real time chat, as every message will require a new connection!
+
+    Also data integrity and privacy are a problem with http, as the protocol even states in its name: "hyper text transfer protocol",
+    it basically transfers human readable text on the upper layer. So with real time apps like chats we would have the problem,
+    that someone could intercept the responses/requests and view personal infos written in the chat or the messages could evenbe altered by a 
+    third party. So of course the many connections are a advantage regarding security, but I would say that it is a two sided thing, because even when it is 
+    hard to interecept the messages, when you succeeded it is easy to read and alter them!
+
+    
+    2) what are advantages and disadvantages of using WebSockets? (name at least two each)
+    Advantages of WebSockets
+    It is persistent: Less overhead then HTTP as the connection between a client and server is kept open until the client sends a request to close the socket.
+   
+    All in all Websockets seem more suited for a real time chat, because of their bidirectional nature, as all the time their will be ne data in form of messages from clients and the server hast to 
+    process those and send them to other clients in a server push pattern. Although we did not do it in this Assignment, it would be quite easy to check for changed data on the server
+    and to write a function, that notifies one or more clients about it, we did something alike with the greeting atleast.
+
+    Websockets can use the secure encrypted wss protocol, that uses tsl ans ssl (okay to be fair, https can also do that), so even if there is a stady connection, there is no real
+    security risk with using websockets for transferring sensitive/private data. 
+
+    Disadvantages:
+
+    Also with websockets their persistence can become a double-edged thing, as the server holds connections open to all clients, and the number of clients is
+    not per se restricted, this can cosnume larges piles of server ressources. And even if one will consider a large ammount of connections an advantage, 
+    one must state that their will be bottlenecks like the database (for example used to store archived/older chats or user preferrences), which can not support
+    an unlimited number of queries at a time and that can lead to downtimes.
+
+    Also the kept open connection is no guarantee for stableness and reliability. As a real time chat is often used with mobile devices like laptops and smartphones,
+    the connection to the internet might be a problem, as often there is not a stable wlan availible. So when clients go offline due to that, we will still
+    have to implement a fall-back system for example to queue messages the server can not send right now and hand them over later, when the client is availible again.
+   
+
+
+
