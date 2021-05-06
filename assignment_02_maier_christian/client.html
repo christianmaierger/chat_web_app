@@ -29,6 +29,7 @@
         <label for="chatname"><i class="far fa-user"></i> Name</label>
         <input id="chatname" type="text" placeholder="Enter your name">
         <button id="btnJoin"><i class="fas fa-sign-in-alt"></i> Join Chat</button>
+        <button id="btnLeave" class="hidden"><i class="fas fa-sign-in-alt"></i> Disconnect From Chat</button>
     </div>
 
     <!-- Second section, including the textarea for the chat messages and the chat members list. Again, note the uniq ID assigned to each item! -->
@@ -37,9 +38,7 @@
         <div class="chatmembers">
             <h3>Current members:</h3>
             <ul id="memberList">
-                <li>Mister X</li>
-                <li>Mary Jane</li>
-                <li>Peter Pan</li>
+
             </ul>
         </div>
     </div>
@@ -48,7 +47,7 @@
     <div class="card">
         <label><i class="far fa-comment-alt"></i> Message</label>
         <input id="message" type="text" placeholder="Enter your message">
-        <button><i class="far fa-paper-plane"></i> Send message</button>
+        <button id="msgButton" class="button_disabled"><i class="far fa-paper-plane"></i> Send message</button>
     </div>
     <script src="scripts/client.js">
     </script>

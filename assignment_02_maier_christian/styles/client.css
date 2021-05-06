@@ -83,6 +83,15 @@ button {
     cursor: default;
 }
 
+#btnLeave {
+    margin-left: 10vw;
+    border-radius: 6px;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
 #chat {
     font-family: sans-serif;
     -webkit-appearance: none;

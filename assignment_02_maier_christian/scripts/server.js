@@ -1,16 +1,12 @@
 // https://github.com/websockets/ws
 const WebSocket = require('ws');
-
 const port = 8080;
-// trough that we create a new server listening on port 8080 
-// clientTracking activated, old code with own list is left commented
 const server = new WebSocket.Server({ clientTracking: true, port: port });
 
-
-// I will make a map  with users in string form with names to help me track and the keys will pe port numbers of the clients
 let clientMap = new Map();
 // list to help with only storing names of current users
-let currentUsers;
+let currentUsers = [];
+let messageHistory = [];
 
 // helper function to remove elements from arrays by value
 // params are a as array and v as value
@@ -44,76 +40,77 @@ server.on('connection', (socket, request) => {
     socket.on('message', (msg) => {
 
         //deserialize JSON to an normal obj
-        let newClient = JSON.parse(msg);
+        let clientMSG = JSON.parse(msg);
 
-        console.log('[server] got message from client:', newClient.str);
-
-
-        socket.send('[client] server got your message: ' + msg);
+        console.log('[server] got message from client:', clientMSG.str);
 
 
-        if (newClient.str == "newClient") {
-
-            console.log('[server] registers new client named:', newClient.name);
+        if (clientMSG.str == "newClient") {
 
 
-            clientMap.set(socket.clientPort, msg.name);
+            //check if we have name in user database and return error message
+            if (currentUsers.includes(clientMSG.name)) {
+                console.log('[server] name is already taken:', clientMSG.name);
+                socket.send(JSON.stringify({ error: "Username already in Server DataBase" }));
+                // if not present register user
+            } else {
 
+                console.log('[server] registers new client named:', clientMSG.name);
 
-            // fill list with usernames still registered on server identified by key port
-            let i = 0;
-            for (let client of server.clients) {
-                if (clientMap.has(client)) {
-                    currentUsers.push(clientMap.get(client));
+                clientMap.set(socket.clientPort, clientMSG.name);
+
+                currentUsers = Array.from(clientMap, ([name, value]) => (value));
+
+                let i = 0;
+
+                let userListInfo = { list: currentUsers, str: "addUser", name: clientMSG.name };
+
+                console.log('[server] now notifying all clients about current Client List new client named:', clientMSG.name);
+
+                for (let client of server.clients) {
+                    if (client != socket) {
+                        client.send(JSON.stringify(userListInfo));
+                    }
                 }
-                i++;
+
             }
+        } else if (clientMSG.str == "newMessage") {
+            console.log('[server] new message will be added to history:', clientMSG.chat);
 
-            let userListInfo = { list: currentUsers, str: "list", user: newClient.name };
+            messageHistory.push({ msg: clientMSG.chat, user: clientMSG.name });
 
+            let msg = { content: clientMSG.chat, name: clientMSG.name, str: "addMessage" }
 
-            // socket.send(JSON.stringify(userListInfo));
-
-
-            console.log('[server] now notifying all clients about new client named:', newClient.name);
-            i = 0;
             for (let client of server.clients) {
-                client.send(JSON.stringify(userListInfo));
-                i++;
+                if (client != socket) {
+                    client.send(JSON.stringify(msg));
+                }
             }
-        }
 
-        if (msg === 'close_connection') {
+
+        } else if (clientMSG.str === 'close_connection') {
             // TODO: Implement - closes the current connection
 
 
             socket.send("[client] server now disconnects");
-            console.log("connection to client from port " + socket.clientPort + " closed")
+            console.log("[server] connection to client from port " + socket.clientPort + " closed")
             socket.close();
 
+            // will have to remove clients from map and name list!
 
-            // console.log("connection to client " + socketList.indexOf(socket) + 1 + " closed")
 
-            // when client tracking is not enabled use instead:
-            // delete clientPort from (active) client List 
-            // removeByValue(socketList, socket);
+        } else if (clientMSG.str === 'init') {
 
-        } else if (msg === 'list_clients') {
-            // TODO: Implement - sends a list of all connected clients to the client 
-            // (each client is identified by its remote port)
+            currentUsers = Array.from(clientMap, ([name, value]) => (value));
+            console.log("[server] will now inform client of active clients")
 
-            socket.send("[client] Number of active client connections of server: " + server.clients.size);
-            let i = 1;
-            /**  for (let clientSocket of socketList) {
-                 socket.send("[server] client " + i + " from port: " + clientSocket.remotePort);
-                 i++;
-             } */
 
-            for (let client of server.clients) {
-                // attention for the WebSocket objects in the Set server.clients, the property for the port is not remotePort, but clientPort!!
-                socket.send("[server] client " + i + " from port: " + client.clientPort);
-                i++;
-            }
+
+            let msg = { list: currentUsers, str: "list", user: clientMSG.name, numberOfClients: server.clients.size, history: messageHistory };
+
+            socket.send(JSON.stringify(msg));
+
+
 
         } else if (msg === 'greet_clients') {
             // TODO: Implement - send a welcome message to all connected clients
@@ -122,10 +119,6 @@ server.on('connection', (socket, request) => {
             for (client of server.clients) {
                 client.send("Hello Client sending from port: " + client.clientPort);
             }
-
-            /**  for (const socket of socketList) {
-                 socket.send("Hello Client!");
-             } */
 
         }
     });
