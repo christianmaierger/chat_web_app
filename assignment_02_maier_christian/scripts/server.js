@@ -6,8 +6,11 @@ const port = 8080;
 // clientTracking activated, old code with own list is left commented
 const server = new WebSocket.Server({ clientTracking: true, port: port });
 
-// at first I managed sockets in my own list, now with clientTracking on Server
-// let socketList = [];
+
+// I will make a map  with users in string form with names to help me track and the keys will pe port numbers of the clients
+let clientMap = new Map();
+// list to help with only storing names of current users
+let currentUsers;
 
 // helper function to remove elements from arrays by value
 // params are a as array and v as value
@@ -17,17 +20,13 @@ function removeByValue(a, v) {
     a = a.splice(index, 1);
 }
 
-// on ist mehtode von node, returned eventemitter, params sind event und callback function, ähnlich zu addEventHandler
 server.on('listening', () => console.log('> server running on port ' + port));
 
 
-// warum die beiden params und wo kommen sie einfach her, finde das krass implizit? Event connection returned das wohl
 server.on('connection', (socket, request) => {
 
 
-    // TODO: find out how to get the information from which port the client connected
-    // and create a new property 'clientPort' on the socket object with this value  
-    // socket.clientPort = ?
+
     socket.clientPort = request.socket.remotePort;
     console.log('[server] new client connected from port: ', socket.clientPort);
 
@@ -42,15 +41,47 @@ server.on('connection', (socket, request) => {
     }
     */
 
-
-    // add socket used to connect to this client to socketList
-    // socketList.push(socket);
-
-
     socket.on('message', (msg) => {
-        console.log('[server] got message from client:', msg);
+
+        //deserialize JSON to an normal obj
+        let newClient = JSON.parse(msg);
+
+        console.log('[server] got message from client:', newClient.str);
+
 
         socket.send('[client] server got your message: ' + msg);
+
+
+        if (newClient.str == "newClient") {
+
+            console.log('[server] registers new client named:', newClient.name);
+
+
+            clientMap.set(socket.clientPort, msg.name);
+
+
+            // fill list with usernames still registered on server identified by key port
+            let i = 0;
+            for (let client of server.clients) {
+                if (clientMap.has(client)) {
+                    currentUsers.push(clientMap.get(client));
+                }
+                i++;
+            }
+
+            let userListInfo = { list: currentUsers, str: "list", user: newClient.name };
+
+
+            // socket.send(JSON.stringify(userListInfo));
+
+
+            console.log('[server] now notifying all clients about new client named:', newClient.name);
+            i = 0;
+            for (let client of server.clients) {
+                client.send(JSON.stringify(userListInfo));
+                i++;
+            }
+        }
 
         if (msg === 'close_connection') {
             // TODO: Implement - closes the current connection
