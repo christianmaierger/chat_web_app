@@ -72,6 +72,8 @@ function sendAndAddUser(elem) {
         //Leave Chat Button becomes visible
         document.getElementById("btnLeave").classList.remove("hidden");
 
+        setTimeout(document.getElementById('chatname').value = "", 1000);
+
         //make msgButton look enabled
         enableButton(document.getElementById("msgButton"));
     }
@@ -92,7 +94,7 @@ function showAndSendMessage() {
 
     // msg has to be serialized, I use build in JSON Support for that
     ws.send(JSON.stringify(msg));
-
+    setTimeout(document.getElementById('chatname').value = "", 1000);
 }
 
 
@@ -183,6 +185,31 @@ function handleMessage(msg) {
 
 document.addEventListener("DOMContentLoaded", connect);
 
-nameButtonListener = document.getElementById('btnJoin').addEventListener('click', (event) => { sendAndAddUser(event.target) }, { once: true });
-msgButtonListener = document.getElementById('msgButton').addEventListener('click', showAndSendMessage);
+document.getElementById('btnJoin').addEventListener('click', (event) => { sendAndAddUser(event.target) }, { once: true });
+document.getElementById('msgButton').addEventListener('click', showAndSendMessage);
+
+document.getElementById('chatname').addEventListener("keydown", function(event) {
+    // Number 13 is the "Enter" key on the keyboard
+    if (event.keyCode === 13) {
+        // Cancel the default action, if needed
+        event.preventDefault();
+
+        // Trigger the button element with a click
+        document.getElementById("btnJoin").click();
+        setTimeout(document.getElementById('chatname').value = "", 1000);
+    }
+});
+
+document.getElementById('message').addEventListener("keydown", function(event) {
+    // Number 13 is the "Enter" key on the keyboard
+    if (event.keyCode === 13) {
+        // Cancel the default action, if needed
+        event.preventDefault();
+
+        // Trigger the button element with a click
+        document.getElementById("msgButton").click();
+        setTimeout(document.getElementById('message').value = "", 1000);
+    }
+});
+
 document.getElementById("btnLeave").addEventListener('click', disconect);
