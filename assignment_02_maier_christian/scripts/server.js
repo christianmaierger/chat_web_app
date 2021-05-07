@@ -88,38 +88,36 @@ server.on('connection', (socket, request) => {
             }
 
 
-        } else if (clientMSG.str === 'close_connection') {
-            // TODO: Implement - closes the current connection
+        } else if (clientMSG.str === 'deleteClient') {
 
 
-            socket.send("[client] server now disconnects");
             console.log("[server] connection to client from port " + socket.clientPort + " closed")
+
+            // delete this client from server
+
+            clientMap.delete(socket.clientPort);
+
+            // make current memberList
+            currentUsers = Array.from(clientMap, ([name, value]) => (value));
+
+            let msg = { name: clientMSG.name, str: "deleteClient" }
+
+
+            console.log("[server] notifying all clients of disconnected client")
+            for (let client of server.clients) {
+                if (client != socket) {
+                    client.send(JSON.stringify(msg));
+                }
+            }
+
             socket.close();
 
-            // will have to remove clients from map and name list!
-
-
         } else if (clientMSG.str === 'init') {
-
             currentUsers = Array.from(clientMap, ([name, value]) => (value));
             console.log("[server] will now inform client of active clients")
 
-
-
             let msg = { list: currentUsers, str: "list", user: clientMSG.name, numberOfClients: server.clients.size, history: messageHistory };
-
             socket.send(JSON.stringify(msg));
-
-
-
-        } else if (msg === 'greet_clients') {
-            // TODO: Implement - send a welcome message to all connected clients
-
-
-            for (client of server.clients) {
-                client.send("Hello Client sending from port: " + client.clientPort);
-            }
-
         }
     });
 });

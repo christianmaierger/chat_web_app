@@ -1,8 +1,7 @@
 let userNameList = [];
 let ws = null;
 let userName;
-
-
+let userNameLi;
 
 
 function connect() {
@@ -24,19 +23,25 @@ function disconect() {
 
     // event listener muss wieder erzeugt werden, da er immer nu einmal funktioniert, damit der button dann dissabled ist
     nameButtonListener = document.getElementById('btnJoin').addEventListener('click', (event) => { sendAndAddUser(event.target) }, { once: true });
+
+    userNameLi.parentNode.removeChild(userNameLi);
+
+    let msg = { name: userName, str: "deleteClient" }
+    ws.send(JSON.stringify(msg));
+
+
 }
 
 
 function initializeUserList() {
 
     const msg = { str: "init", name: userName };
-
     ws.send(JSON.stringify(msg));
-
 }
 
 
 function sendAndAddUser(elem) {
+
 
     let userNameInputElem = document.getElementById('chatname');
     userName = userNameInputElem.value;
@@ -51,8 +56,9 @@ function sendAndAddUser(elem) {
         // event listener muss wieder erzeugt werden, da er immer nu einmal funktioniert, damit der button dann dissabled ist
         nameButtonListener = document.getElementById('btnJoin').addEventListener('click', (event) => { sendAndAddUser(event) }, { once: true });
     } else {
-        document.getElementById('memberList').appendChild(listItem);
-
+        // save elem with username to delte it easily when disconnecting
+        userNameLi = document.getElementById('memberList').appendChild(listItem);
+        userNameLi.setAttribute("id", elem);
 
         // festhalten genau der Name ist vergeben
         userNameList.push(userName);
@@ -85,18 +91,14 @@ function showAndSendMessage() {
     let chatMSG = chatInputElem.value;
 
     chatMSG = chatMSG.trim();
-
     // append msg to chatArea
     document.getElementById("chat").value += "\n" + userName + ": " + chatMSG;
 
-
     const msg = { str: "newMessage", name: userName, chat: chatMSG };
-
     // msg has to be serialized, I use build in JSON Support for that
     ws.send(JSON.stringify(msg));
     setTimeout(document.getElementById('chatname').value = "", 1000);
 }
-
 
 function disableButton(elem) {
     console.log(elem);
@@ -107,9 +109,6 @@ function enableButton(elem) {
     console.log(elem);
     elem.classList.remove("button_disabled");
 }
-
-
-
 
 function handleMessage(msg) {
     console.log('[client] got message from server:', msg.data);
@@ -133,35 +132,29 @@ function handleMessage(msg) {
 
 
         let membersList = document.getElementById("memberList");
-
-        //let membersINHTML = document.getElementById("memberList").getElementsByTagName("li");
-        console.log(msg.list);
-
         userNameList = msg.list;
 
-        // fill user lsit in html
+        // fill user list in html
         for (const elem of msg.list) {
             listPoint = document.createElement("li");
+            listPoint.setAttribute("id", elem);
             liContent = document.createTextNode(elem);
             listPoint.appendChild(liContent);
             membersList.appendChild(listPoint);
         }
-
         // append msg history from server to chatArea
         for (const it of msg.history) {
             document.getElementById("chat").value += "\n" + it.user + ": " + it.msg;
         }
-
     }
 
     // when client is already registered and a new user joins
     if (msg.str == "addUser") {
         let membersList = document.getElementById("memberList");
-
-
         userNameList.push(msg.name);
 
         listPoint = document.createElement("li");
+        listPoint.setAttribute("id", msg.name);
         liContent = document.createTextNode(msg.name);
         listPoint.appendChild(liContent);
         membersList.appendChild(listPoint);
@@ -171,15 +164,19 @@ function handleMessage(msg) {
 
     }
     if (msg.str == "addMessage") {
-
-
-
-
         // print new message to console
         document.getElementById("chat").value += "\n" + msg.name + ": " + msg.content;
+    }
+    if (msg.str == "deleteClient") {
+
+
+
+        let elem = document.getElementById(msg.name);
+
+        elem.parentElement.removeChild(elem);
+
 
     }
-
 }
 
 
