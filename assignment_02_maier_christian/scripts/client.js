@@ -165,7 +165,7 @@ function handleMessage(msg) {
     }
     if (msg.str == "addMessage") {
         // print new message to console
-        document.getElementById("chat").value += "\n" + msg.name + ": " + msg.content;
+        document.getElementById("chat").value += "\n" + msg.time + " from " + msg.name + ": " + msg.content;
     }
     if (msg.str == "deleteClient") {
 

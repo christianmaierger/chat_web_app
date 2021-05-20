@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peer2Peer</title>
+
+    <link rel="stylesheet" href="styles/client.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+</head>
+
+<body>
+
+    <!-- Header, not important for the assignment -->
+    <header>
+        <div class="header-item">
+            <h2>KS-B Assignments</h2>
+            <h1>Peer2Peer</h1>
+        </div>
+        <div class="header-item">
+            <img src="img/logo_mci_hci_200x96.png">
+        </div>
+    </header>
+
+    <div class="card">
+        <div class="peerConnectionGrid">
+            <div class="peerConnectionInfo">
+                <span>My ID:</span>
+                <pre id="myId">Not connected</pre>
+            </div>
+            <div class="peerConnectionInfo">
+                <span>Connected to peer:</span>
+                <pre id="connectedPeers">No peer connected</pre>
+            </div>
+        </div>
+        <div class="connectToPeerInput">
+            <label for="chatname"><i class="far fa-user"></i> Connect to Peer:</label>
+            <input id="peerid" type="text" placeholder="Enter the ID">
+            <button id="btnJoin"><i class="fas fa-sign-in-alt"></i> Connect</button>
+        </div>
+        <div class="peerConnectionStatus">
+            <span>WebRTC Connection Status:</span>
+            <span id="connectionStatus" class="peerNotConnected">Not connected</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <textarea name="chat" id="messages" rows="10" readonly></textarea>
+
+        <div class="sendMessageInput">
+            <label><i class="far fa-comment-alt"></i> Message</label>
+            <input id="myMessage" type="text" placeholder="Enter your message">
+            <button id="btnSend"><i class="far fa-paper-plane"></i> Send message</button>
+        </div>
+    </div>
+
+    <script src="./js/peer.js"></script>
+    <script src="./js/chat.js"></script>
+
+</body>
+
+</html>

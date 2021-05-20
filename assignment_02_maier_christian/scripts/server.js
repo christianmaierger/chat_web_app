@@ -26,16 +26,6 @@ server.on('connection', (socket, request) => {
     socket.clientPort = request.socket.remotePort;
     console.log('[server] new client connected from port: ', socket.clientPort);
 
-    // hier könnte man pub/sub implementieren um alle connecten clients über den Neuen zu informieren, siehe task 2 Übung 2
-    // ganz ehrlich, ich hab die in der Liste, kann die auch einfach durchiterieren, event connection triggert
-    // und hier "notifie" ich darüber die anderen Clients, ist einfachstes Pub/sub in meinen Augen
-
-    /** 
-    let i = 1;
-    for (client of server.clients) {
-        client.send("[server] new client connected from port: " + socket.clientPort);
-    }
-    */
 
     socket.on('message', (msg) => {
 
@@ -77,9 +67,14 @@ server.on('connection', (socket, request) => {
         } else if (clientMSG.str == "newMessage") {
             console.log('[server] new message will be added to history:', clientMSG.chat);
 
-            messageHistory.push({ msg: clientMSG.chat, user: clientMSG.name });
+            var timestamp = Date.now();
+            var date = new Date(timestamp);
+            hours = date.getHours();
+            minutes = date.getMinutes();
 
-            let msg = { content: clientMSG.chat, name: clientMSG.name, str: "addMessage" }
+            messageHistory.push({ msg: clientMSG.chat, user: clientMSG.name, time: hours + ":" + minutes });
+
+            let msg = { content: clientMSG.chat, name: clientMSG.name, str: "addMessage", time: hours + ":" + minutes }
 
             for (let client of server.clients) {
                 if (client != socket) {
