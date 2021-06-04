@@ -38,6 +38,7 @@
             <label for="chatname"><i class="far fa-user"></i> Connect to Peer:</label>
             <input id="peerid" type="text" placeholder="Enter the ID">
             <button id="btnJoin"><i class="fas fa-sign-in-alt"></i> Connect</button>
+            <button id="btnLeave" class="gone"><i class="fas fa-sign-out-alt"></i>Disconnect</button>
         </div>
         <div class="peerConnectionStatus">
             <span>WebRTC Connection Status:</span>
@@ -51,7 +52,7 @@
         <div class="sendMessageInput">
             <label><i class="far fa-comment-alt"></i> Message</label>
             <input id="myMessage" type="text" placeholder="Enter your message">
-            <button id="btnSend"><i class="far fa-paper-plane"></i> Send message</button>
+            <button id="btnSend" class="button_disabled"><i class="far fa-paper-plane"></i> Send message</button>
         </div>
     </div>
 
