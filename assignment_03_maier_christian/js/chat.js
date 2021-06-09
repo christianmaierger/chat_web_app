@@ -19,10 +19,6 @@ let WebRTCDataConnection;
 let myId;
 
 
-
-
-
-
 const options = {
     //host: 'localhost',
     host: 'scml.hci.uni-bamberg.de', //<- our public peerjs server - give it a try!
@@ -84,8 +80,8 @@ peer.on('close', () => {
 
 peer.on('error', (err) => {
     console.warn('PeerJS error:', err.message);
-
-})
+    alert('PeerJS error:', err.message);
+});
 
 
 //////////////////////////////  WebRTC related   ////////////////////
@@ -114,8 +110,6 @@ peer.on('connection', function(dataConnection) {
 
 
 
-
-
 function addFunctToLeaveBtn() {
     btnLeave.addEventListener("click", function() {
         WebRTCDataConnection.close();
@@ -133,12 +127,6 @@ function updateWebRTCDataConnection(connection) {
     // initialise/update connection and add event listener(s) here
     WebRTCDataConnection = connection;
 
-
-
-    // This fires if connection can not be established , but takes quite some time
-    peer.on('error', function(err) {
-        alert("Sry, connection to peer failed because of " + err);
-    });
 
     /** 
      * This event fires if you initiated the data connection to _another_ client and it was successfull. 
@@ -167,7 +155,7 @@ function updateWebRTCDataConnection(connection) {
 
     WebRTCDataConnection.on('close', function() {
         console.warn('WebRTCConnection to other peer was closed');
-        changeIdOfConnectedPeerDisplayed("No peer connected");
+        deleteIDOfPeerFromGui();
         disconnectToJoinBtn();
         changeConnectionStatus()
         disableButton(btnSendMsg);
@@ -177,21 +165,20 @@ function updateWebRTCDataConnection(connection) {
 }
 
 
-
-
 // helper functions to handle data from incoming connection
 
 function handleData(msg) {
-
     // data shall always be string
     document.getElementById("messages").value += "\n" + currentPeer + ": " + msg;
-
-
 }
 
 
 //////////////////////////////  UI related   ////////////////////
 
+function deleteIDOfPeerFromGui() {
+    document.getElementById("connectedPeers").innerHTML = "No peer connected";
+    document.getElementById("peerid").value = "";
+}
 
 // helper functions to change gui elements
 function changeIdOfConnectedPeerDisplayed(peerID) {
@@ -257,10 +244,11 @@ function connectToPeer() {
         WebRTCDataConnection = peer.connect(peerid)
 
         updateWebRTCDataConnection(WebRTCDataConnection);
+
     }
 
 
-
+    // scheint mir eher unnötig zu sein
     function updateWebRTCConnectionStatus() {
         console.log('updateWebRTCConnectionStatus');
         // TODO: implement
@@ -273,10 +261,14 @@ function sendMsg() {
     let chatInputElem = document.getElementById('myMessage');
     let chatMSG = chatInputElem.value;
 
-    chatMSG = chatMSG.trim();
-    // append msg to chatArea
-    document.getElementById("messages").value += "\n" + myId + ": " + chatMSG;
+    if (chatMSG === "") {
+        alert("Sry, empty message can not be send");
+    } else {
 
-    WebRTCDataConnection.send(chatMSG);
+        chatMSG = chatMSG.trim();
+        // append msg to chatArea
+        document.getElementById("messages").value += "\n" + myId + ": " + chatMSG;
 
+        WebRTCDataConnection.send(chatMSG);
+    }
 }
