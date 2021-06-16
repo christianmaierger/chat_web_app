@@ -20,8 +20,8 @@ let myId;
 
 
 const options = {
-    //host: 'localhost',
-    host: 'scml.hci.uni-bamberg.de', //<- our public peerjs server - give it a try!
+    host: 'localhost',
+    // host: 'scml.hci.uni-bamberg.de', //<- our public peerjs server - give it a try!
     port: 9000,
     path: '/chat'
 }
@@ -144,8 +144,6 @@ function updateWebRTCDataConnection(connection) {
 
         enableButton(btnSendMsg);
 
-
-
     });
 
     WebRTCDataConnection.on('data', function(data) {
@@ -260,6 +258,7 @@ function sendMsg() {
     console.log('sendMsg');
     let chatInputElem = document.getElementById('myMessage');
     let chatMSG = chatInputElem.value;
+    chatInputElem.value = "" 
 
     if (chatMSG === "") {
         alert("Sry, empty message can not be send");
