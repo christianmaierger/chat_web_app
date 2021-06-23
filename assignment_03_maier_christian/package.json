@@ -9,6 +9,7 @@
   "author": "Tony",
   "license": "ISC",
   "dependencies": {
-    "peer": "^0.5.3"
+    "peer": "^0.5.3",
+    "perge": "^1.2.1"
   }
 }
