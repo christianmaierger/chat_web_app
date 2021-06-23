@@ -13,7 +13,7 @@
 
 var mouseIsDown = false
 var pixelChanged;
-changedByClick = false;
+
 
 
 class PixelBoard {
@@ -34,6 +34,8 @@ class PixelBoard {
      * method to 'draw' the pixelboard by creating a div node for each pixel
      */
     draw() {
+
+
         this._pixelBoardContainer.innerHTML = ""; // reset the previous pixel raster
 
         const pixelsDivs = document.createDocumentFragment(); // create in memory (virtual) DOM element container for appending divs
@@ -48,31 +50,27 @@ class PixelBoard {
             divNode.addEventListener('mouseup', function() {
                 mouseIsDown = false;
                 console.log("up")
+                sendChangedDiv();
             })
 
             divNode.addEventListener("mousedown", (event) => {
                 console.log('mdown', i);
                 mouseIsDown = true;
 
-                this.changePixel(i, event); // will be executed after mousedown event
+                this.changePixel(i, event, true); // will be executed after mousedown event
                 pixelChanged = i;
                 //changedByClick = true;
             }, { once: true })
 
             divNode.addEventListener('mousemove', (event) => {
-                if (mouseIsDown) {
+                if (mouseIsDown && pixelChanged != i) {
                     // implement drawing logic here
 
                     console.log('mMove', i);
-                    console.log('pixel', pixelChanged);
-                    console.log('target changed', changedByClick);
 
-                    if (pixelChanged != i /**&& changedByClick == false**/ ) {
-                        this.changePixel(i, event); // will be executed after mousedown event
-                        pixelChanged = i;
-                        changedByClick = false;
-                    }
 
+                    this.changePixel(i, event, false); // will be executed after mousedown event
+                    pixelChanged = i;
                 }
             }, { once: true })
 
@@ -100,7 +98,7 @@ class PixelBoard {
      * @param index - index of the pixel to change
      * @param event - the MouseEvent after the pixel node was clicked
      */
-    changePixel(index, event) {
+    changePixel(index, event, singleChange) {
         let pixelNode = event.target; // the corresponding div representing the pixel
         let currentValue = pixelNode.getAttribute("data-value"); // the current value (0 || 1) is stored in the data-value attribute
         let newValue = 0; // default case for the new value (iff the pixel was filled before)
@@ -119,9 +117,9 @@ class PixelBoard {
         pixelNode.setAttribute("data-value", String(newValue)); // update the data-value attribute of the pixel div node
         pixelNode.className = 'me';
 
-        // TODO: notify other peer
+        // TODO: notify other peer - but this is done only when mouse button is realised to reduce network load and drawing time when receiving
 
-        sendChangedDiv();
+
 
     }
 
@@ -137,13 +135,11 @@ class PixelBoard {
         // first write new value from html pixelNode in the index of the array the div belongs to, as the pixelBoard is a part of the doc it is updated automatically
         // first in tupel is the value 1 for full/blue and 0 for empty/white
 
-        pb.pixelboardDocument = Automerge.change(pb._pixelboardDocument, obj => { obj.pixelBoard[index][0] = newValue });
-        pb.pixelboardDocument = Automerge.change(pb._pixelboardDocument, obj => { obj.pixelBoard[index][1] = myId });
+        pb.pixelboardDocument = Automerge.change(pb._pixelboardDocument, obj => {
+            obj.pixelBoard[index][0] = newValue;
+            obj.pixelBoard[index][1] = myId
+        });
 
-        //obj[index][0] = newValue
-        // this.pixelBoard[index][0] = newValue;
-        // second is the peerId to odentify who set the value
-        // this.pixelBoard[index][1] = myId;
 
     }
 
@@ -197,6 +193,8 @@ peer.on('open', function(id) {
     myId = id;
     document.getElementById("myId").innerHTML = id;
 
+    enableButton(btnJoin);
+
     /** Periodically get list of ids of all connected PeerJS clients on PeerJS Server: */
     //  setInterval(function() {
     //     peer.listAllPeers((l) => console.log(l))
@@ -208,7 +206,7 @@ peer.on('open', function(id) {
 peer.on('disconnected', function() {
     // Nur Connection zum Server lost
     console.warn('disconnected from PeerJS server: ' + options.host);
-
+    alert('disconnected from PeerJS server: ' + options.host);
     // RtC still exists but as client disconnected from signaling server I guess will have to display this
     document.getElementById("myId").innerHTML = "Not Connected";
 
@@ -223,6 +221,7 @@ peer.on('disconnected', function() {
 peer.on('close', () => {
     // Server ist weg
     console.log('connection to PeerJS server closed');
+    alert('connection to PeerJS server closed');
 
     // disable connect to other peer button as this is no longer possible
     disableButton(btnJoin);
@@ -232,8 +231,11 @@ peer.on('close', () => {
 });
 
 peer.on('error', (err) => {
-    console.warn('PeerJS error:', err.message);
-    alert('PeerJS error:', err.message);
+
+    error = err;
+    alert('PeerJS error:', error.message);
+    console.warn('PeerJS error:', error.message);
+
 });
 
 
@@ -249,7 +251,7 @@ peer.on('connection', function(dataConnection) {
 
 
 
-    console.log('received data connection from other peer: ', dataConnection.peer);
+    //console.log('received data connection from other peer: ', dataConnection.peer);
     WebRTCDataConnection = dataConnection;
 
     joinBtnToDisconnectBtn();
@@ -291,8 +293,14 @@ function updateWebRTCDataConnection(connection) {
         // SUCCESS
         console.log('requested data connection was successfully opened');
 
+
         // as this is a cooperative system drawing on board will only be enabled when connected to peer, so both can use that sapace
         pb.draw();
+
+
+
+        // text about initialising board is set to hidden
+        document.getElementById("placeHolderText").classList.add("hidden");
 
         currentPeer = WebRTCDataConnection.peer;
         joinBtnToDisconnectBtn();
@@ -302,15 +310,20 @@ function updateWebRTCDataConnection(connection) {
     });
 
     WebRTCDataConnection.on('data', function(data) {
-        console.log('received data from other peer: ' + data);
-        handleData(data);
+        //console.log('received data from other peer: ' + data);
+
+        setTimeout(handleData(data), 1);
+
     });
 
     WebRTCDataConnection.on('close', function() {
         console.warn('WebRTCConnection to other peer was closed');
+        alert('WebRTCConnection to other peer was closed');
         deleteIDOfPeerFromGui();
         disconnectToJoinBtn();
         changeConnectionStatus()
+            // text about initialising board is set to visible
+        document.getElementById("placeHolderText").classList.remove("hidden")
     });
 
 
@@ -323,20 +336,18 @@ function handleData(msg) {
     // data shall always be JSON that will be parsed here
     msG = JSON.parse(msg);
 
-    // console.log(msG.docu.pixelBoard);
+    // when using Autmoerge save()/load() I always had the problem that the msg received was an ArrayBuffer
+    //and even when I tried to put it into ByteArray with the length specified by Automerge, then load did not work 
 
     let doc2 = Automerge.init();
 
     let newDoc = Automerge.from({ // initialise our shared document object containing a 'pixelBoard' property
             pixelBoard: msG.docu.pixelBoard
-        }) // initially fill the pixelboard with empty pixels and our actor id (-> array of 2-tuples)
+        }) //  fill the pixelboard with the changed pixelboard from other client
 
 
-
-    pb.pixelboardDocument = Automerge.merge(newDoc, doc2)
-
-    // pb.pixelboardDocument = newDoc;
-
+    // when I merge with existing pixelBoard then GUi does not block but result seems more inconsistent
+    pb.pixelboardDocument = Automerge.merge(doc2, newDoc)
 
 
 }
@@ -395,7 +406,7 @@ btnJoin.addEventListener("click", connectToPeer);
 
 
 function connectToPeer() {
-    console.log('connectToPeer');
+    //console.log('connectToPeer');
 
     let peerInputElem = document.getElementById('peerid');
 
@@ -405,9 +416,14 @@ function connectToPeer() {
         alert("Sry, peer Id may not be empty");
     } else {
 
-        WebRTCDataConnection = peer.connect(peerid)
+        try {
+            WebRTCDataConnection = peer.connect(peerid)
 
-        updateWebRTCDataConnection(WebRTCDataConnection);
+            updateWebRTCDataConnection(WebRTCDataConnection);
+
+        } catch {
+            alert("Error connecting to peer, maybe ID was false");
+        }
 
     }
 

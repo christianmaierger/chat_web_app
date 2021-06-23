@@ -42,7 +42,7 @@
         <div class="connectToPeerInput">
             <label for="peerid"><i class="far fa-user"></i> Connect to Peer:</label>
             <input id="peerid" type="text" placeholder="Enter the ID">
-            <button id="btnJoin"><i class="fas fa-sign-in-alt"></i> Connect</button>
+            <button id="btnJoin" class="button_disabled"><i class="fas fa-sign-in-alt"></i> Connect</button>
             <button id="btnLeave" class="gone"><i class="fas fa-sign-out-alt"></i> Disconnect</button>
         </div>
         <div class="peerConnectionStatus">
@@ -56,8 +56,10 @@
             Legend:
             <span class="me"><i class="far fa-user-circle"></i> Me</span>
             <span class="other"><i class="far fa-user-circle"></i> Other peer</span>
+            <h1 id="placeHolderText"> Board will be initialised with Connection to Peer </h1>
         </div>
-        <div id="pixelboard"></div>
+        <div id="pixelboard">
+        </div>
 
     </div>
 
