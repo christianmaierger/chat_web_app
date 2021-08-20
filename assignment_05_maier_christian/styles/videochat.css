@@ -1,0 +1,42 @@
+
+video {
+    display: none;
+    width: 100%;
+}
+
+#videoLocal {
+    /* mirror mode for local video feed */
+    transform: scaleX(-1);
+}
+
+.videoGrid {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+
+}
+
+.videoRemoteContainer {
+    position: relative;
+    overflow: hidden;
+}
+
+#waitingText {
+    display: none;
+    margin-top: 2rem;
+}
+
+#videoRemote {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#videoBtn {
+    border-radius: 6px;
+    width: 100%;
+}
+#videoBtn:disabled {
+    background-color: #34495e47;
+}

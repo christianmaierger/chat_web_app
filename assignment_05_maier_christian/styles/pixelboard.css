@@ -1,0 +1,63 @@
+#pixelboard {
+    box-sizing: border-box;
+    width: 1000px;
+    display: grid;
+    grid-template-columns: repeat(32, calc(100% / 32));
+    grid-template-rows: repeat(16, calc(1000px / 32));
+    border-left: solid 1px #999;
+    border-top: solid 1px #999;
+    /*display: none;*/
+}
+
+#placeHolderText {
+    font-family: sans-serif;
+    -webkit-appearance: none;
+    background-color: #f0f0f0;
+    border: none;
+    font-size: 20px;
+    padding: 20px;
+    border-radius: 6px;
+    line-height: 1.3;
+    width: 100%;
+    display: inline;
+}
+
+#pixelboard div {
+    border-bottom: solid 1px #999;
+    border-right: solid 1px #999;
+}
+
+#pixelboard div[data-value='1'].me {
+    background-color: #34495e;
+}
+
+#pixelboard div[data-value='1'].other {
+    background-color: #d64541;
+}
+
+.legend {
+    padding-bottom: 30px;
+    padding-top: 10px;
+}
+
+.legend span {
+    padding: 7px 10px;
+    margin-left: 6px;
+    border-radius: 4px;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+.legend span.me {
+    background-color: #34495e;
+}
+
+.legend span.other {
+    background-color: #d64541;
+}
+
+#btnSyncPixelboard {
+    border-radius: 6px;
+    margin-top: -13px;
+    float: right;
+}
