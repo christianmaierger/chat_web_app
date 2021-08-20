@@ -1,0 +1,8 @@
+Please answer the following questions:
+
+For real-time chat applications in a collaborative setting
+    1) what are advantages and disadvantages of using a peer-to-peer network approach? (name at least one each)
+
+Hint: you do not only have to focus on technical aspects.
+
+Please put your answers in a file called ANSWERS.txt

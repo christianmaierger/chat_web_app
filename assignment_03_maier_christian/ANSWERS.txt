@@ -1,0 +1,12 @@
+For real-time chat applications in a collaborative setting
+    1) what are advantages and disadvantages of using a peer-to-peer network approach? (name at least one each)
+
+    Advantages:
+    Communication does not rely on continous working server, even if server fails, chat can continue between peers
+    Trustless communication - as messages never go to server, sender does not have to trust party operating it
+
+
+    Dissadvantages:
+    Should be harder to scale to larger amounts of users then a client/server architecture
+    If you also want to submit files between peers, like often done in a chat, every sender is responsible for keeping them free of viruses,
+    also a server will mostly have better protection from that

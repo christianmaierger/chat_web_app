@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Pixelboard</title>
+    <link rel="icon" href="favicon.ico">
+
+    <link rel="stylesheet" href="styles/client.css">
+    <link rel="stylesheet" href="styles/pixelboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+
+    <script src="./dist/automerge.js"></script>
+    <script src="./dist/peer.js"></script>
+</head>
+
+<body>
+
+    <!-- Header, not important for the assignment -->
+    <header>
+        <div class="header-item">
+            <h2>KS-B Assignments</h2>
+            <h1>Shared Pixelboard</h1>
+        </div>
+        <div class="header-item">
+            <img src="img/logo_mci_hci_200x96.png">
+        </div>
+    </header>
+
+    <div class="card">
+        <div class="peerConnectionGrid">
+            <div class="peerConnectionInfo">
+                <span>My ID:</span>
+                <pre id="myId">Not connected</pre>
+            </div>
+            <div class="peerConnectionInfo">
+                <span>Connected to peer:</span>
+                <pre id="connectedPeers">No peer connected</pre>
+            </div>
+        </div>
+        <div class="connectToPeerInput">
+            <label for="peerid"><i class="far fa-user"></i> Connect to Peer:</label>
+            <input id="peerid" type="text" placeholder="Enter the ID">
+            <button id="btnJoin" class="button_disabled"><i class="fas fa-sign-in-alt"></i> Connect</button>
+            <button id="btnLeave" class="gone"><i class="fas fa-sign-out-alt"></i> Disconnect</button>
+        </div>
+        <div class="peerConnectionStatus">
+            <span>WebRTC Connection Status:</span>
+            <span id="connectionStatus" class="peerNotConnected">Not connected</span>
+        </div>
+    </div>
+
+    <div class="card" id="pixelCard">
+        <div class="legend">
+            Legend:
+            <span class="me"><i class="far fa-user-circle"></i> Me</span>
+            <span class="other"><i class="far fa-user-circle"></i> Other peer</span>
+            <h1 id="placeHolderText"> Board will be initialised with Connection to Peer </h1>
+        </div>
+        <div id="pixelboard">
+        </div>
+
+    </div>
+
+    <script src="./js/PixelBoard.js"></script>
+
+</body>
+
+</html>
