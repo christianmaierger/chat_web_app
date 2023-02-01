@@ -94,6 +94,7 @@ button {
 
 .button_disabled {
     background-color: #7b7d80;
+    pointer-events: none;
     cursor: default;
 }
 

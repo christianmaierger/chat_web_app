@@ -2,17 +2,23 @@ let userNameList = [];
 let ws = null;
 let userName;
 let userNameLi;
+let nameButtonListener;
 
 
 function connect() {
-    ws = new WebSocket("ws://localhost:8080");
-    ws.onmessage = msg => handleMessage(msg);
-    setTimeout(initializeUserList, 100);
+    try {
+        ws = new WebSocket("ws://localhost:8080");
+        ws.onmessage = msg => handleMessage(msg);
+        setTimeout(initializeUserList, 100);
+        enableButton(document.getElementById("btnJoin")); 
+    } catch (error) {
+        alert("Unfortunatelly an error connecting occured - Server might not be running properly right now");
+    }
 }
 
-function disconect() {
+function disconnect() {
 
-    //Join Chat button will be graphically disabled
+    //send msg button will be graphically disabled
     disableButton(document.getElementById("msgButton"));
 
     //Leave Chat Button becomes invisible
@@ -28,8 +34,6 @@ function disconect() {
 
     let msg = { name: userName, str: "deleteClient" }
     ws.send(JSON.stringify(msg));
-
-
 }
 
 
@@ -39,31 +43,31 @@ function initializeUserList() {
     ws.send(JSON.stringify(msg));
 }
 
-
+// elem is the element/btn triggering the function
 function sendAndAddUser(elem) {
 
-
-    let userNameInputElem = document.getElementById('chatname');
-    userName = userNameInputElem.value;
+    userName = document.getElementById('chatname').value;
 
     let listItem = document.createElement('li');
     listItem.innerHTML = userName.trim();
 
 
-    if (userNameList.size != 0 && (userNameList.includes(userName) || userName === "")) {
+    if ( (userNameList.length != 0 && userNameList.includes(userName)) || userName === "") {
         console.log("Sry UserName is already used or empty, choose another");
 
-        // event listener muss wieder erzeugt werden, da er immer nu einmal funktioniert, damit der button dann dissabled ist
-        nameButtonListener = document.getElementById('btnJoin').addEventListener('click', (event) => { sendAndAddUser(event) }, { once: true });
+        // event listener muss wieder erzeugt werden, da er immer nur einmal funktioniert, damit der button dann dissabled ist
+        nameButtonListener = document.getElementById('btnJoin').addEventListener('click', (event) => { sendAndAddUser(event.target) }, { once: true });
     } else {
-        // save elem with username to delte it easily when disconnecting
+        // save elem with username to delete it easily when disconnecting
         userNameLi = document.getElementById('memberList').appendChild(listItem);
+        console.log(" this is elem/btn: " + elem);
+
         userNameLi.setAttribute("id", elem);
 
         // festhalten genau der Name ist vergeben
         userNameList.push(userName);
 
-        // print new user to console, guess in the end server must push this to all clients
+        // print new user to console, server must push this to all clients
         document.getElementById("chat").value += "\nA new user named " + userName + " joined the chat";
 
         // send an object containing message and userName
@@ -83,7 +87,6 @@ function sendAndAddUser(elem) {
         //make msgButton look enabled
         enableButton(document.getElementById("msgButton"));
     }
-
 }
 
 function showAndSendMessage() {
@@ -117,19 +120,17 @@ function handleMessage(msg) {
         msg = JSON.parse(msg.data);
     } catch (e) {
         console.log("[client] error parsing JSON file to Object");
-    }
-
+        if (msg.error != undefined) {
+            alert(msg.error);
+        }
+    } 
+    
     if (msg.str == "" || msg.str == null) {
         alert("msg was null or empty");
     }
 
-    if (msg.error != undefined) {
-        alert(msg.error);
-    }
-
     // only for initial list
     if (msg.str == "list") {
-
 
         let membersList = document.getElementById("memberList");
         userNameList = msg.list;
@@ -169,13 +170,8 @@ function handleMessage(msg) {
     }
     if (msg.str == "deleteClient") {
 
-
-
         let elem = document.getElementById(msg.name);
-
         elem.parentElement.removeChild(elem);
-
-
     }
 }
 
@@ -185,9 +181,11 @@ document.addEventListener("DOMContentLoaded", connect);
 document.getElementById('btnJoin').addEventListener('click', (event) => { sendAndAddUser(event.target) }, { once: true });
 document.getElementById('msgButton').addEventListener('click', showAndSendMessage);
 
+
+// event lsiteners for chatname and message field, so hitting enter will trigger sending of the input string
 document.getElementById('chatname').addEventListener("keydown", function(event) {
     // Number 13 is the "Enter" key on the keyboard
-    if (event.keyCode === 13) {
+    if (event.key === 'Enter') {
         // Cancel the default action, if needed
         event.preventDefault();
 
@@ -199,14 +197,15 @@ document.getElementById('chatname').addEventListener("keydown", function(event) 
 
 document.getElementById('message').addEventListener("keydown", function(event) {
     // Number 13 is the "Enter" key on the keyboard
-    if (event.keyCode === 13) {
+    if (event.key === 'Enter') {
         // Cancel the default action, if needed
         event.preventDefault();
 
         // Trigger the button element with a click
         document.getElementById("msgButton").click();
+        // clear message field after sending trough triggereing send btn
         setTimeout(document.getElementById('message').value = "", 1000);
     }
 });
 
-document.getElementById("btnLeave").addEventListener('click', disconect);
+document.getElementById("btnLeave").addEventListener('click', disconnect);
