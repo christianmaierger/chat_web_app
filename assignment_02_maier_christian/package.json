@@ -4,11 +4,19 @@
   "description": "WS Test Server",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start-client": "open-cli client.html",
+    "start": "node ./scripts/server.js"
   },
-  "author": "",
+  "author": "Tony from Bamberg HCI chair and Christian Maier",
   "license": "ISC",
   "dependencies": {
     "ws": "^7.2.3"
+  },
+  "devDependencies": {
+    "open-cli": "^7.1.0"
   }
 }
+
+
+  
