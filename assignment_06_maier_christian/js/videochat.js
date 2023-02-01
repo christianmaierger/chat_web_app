@@ -198,9 +198,12 @@ peerid.value = '';
 
 const options = {
     //host: 'localhost',
-    host: 'scml.hci.uni-bamberg.de',
-    port: 9000,
-    path: '/chat'
+   /*  If you DON'T specify 'host' and 'key' options, you will automatically connect to
+    PeerServer Cloud service. Please be aware that you will be sharing it with other 
+    people and IDs may collide if you set them manually. */
+   // host: 'scml.hci.uni-bamberg.de',
+    //port: 9000,
+    //path: '/chat'
 }
 
 /** Connect with a PeerJS server */
@@ -214,7 +217,7 @@ peer.on('open', function(id) {
     connectedToPeerJSServer = true;
     console.log('My peer ID is: ' + id);
     myId = id;
-    document.getElementById('myId').textContent = id;
+    document.getElementById('myId').textContent = myId;
     enableButton(btnJoin);
 });
 
@@ -562,14 +565,14 @@ async function checkAvailableMediaDevices() {
         }
     });
 
-    promise.then(function(obj) {
+    promise.then(function() {
         if (audioAvailable || videoAvailable) {
 
             console.log("btnEnabled");
             videoBtn.disabled = false;
             enableButton(videoBtn);
         } else {
-            alert("Sry no Audio or Video Device availible");
+            alert("Sry no Audio or Video Input Device availible");
         }
     });
 }
