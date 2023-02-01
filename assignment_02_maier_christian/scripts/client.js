@@ -90,6 +90,9 @@ function sendAndAddUser(elem) {
 }
 
 function showAndSendMessage() {
+    if (document.getElementById("msgButton").classList.contains("button_disabled")) {
+            // if user is not allowed to send messages, because not logged in or something else, do nothing
+    } else {
     let chatInputElem = document.getElementById('message');
     let chatMSG = chatInputElem.value;
 
@@ -101,6 +104,7 @@ function showAndSendMessage() {
     // msg has to be serialized, I use build in JSON Support for that
     ws.send(JSON.stringify(msg));
     setTimeout(document.getElementById('chatname').value = "", 1000);
+    }
 }
 
 function disableButton(elem) {
@@ -145,7 +149,8 @@ function handleMessage(msg) {
         }
         // append msg history from server to chatArea
         for (const it of msg.history) {
-            document.getElementById("chat").value += "\n" + it.user + ": " + it.msg;
+            console.log(it.msg);
+            document.getElementById("chat").value += "\n" + it.time + "| " + it.user + ": " + it.msg;
         }
     }
 
@@ -175,14 +180,13 @@ function handleMessage(msg) {
     }
 }
 
-
+// this happens at startup
 document.addEventListener("DOMContentLoaded", connect);
-
 document.getElementById('btnJoin').addEventListener('click', (event) => { sendAndAddUser(event.target) }, { once: true });
 document.getElementById('msgButton').addEventListener('click', showAndSendMessage);
 
 
-// event lsiteners for chatname and message field, so hitting enter will trigger sending of the input string
+// event listeners for chatname and message field, so hitting enter will trigger sending of the input string
 document.getElementById('chatname').addEventListener("keydown", function(event) {
     // Number 13 is the "Enter" key on the keyboard
     if (event.key === 'Enter') {

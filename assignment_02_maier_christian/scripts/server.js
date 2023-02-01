@@ -42,14 +42,17 @@ server.on('connection', (socket, request) => {
         } else if (clientMSG.str == "newMessage") {
             console.log('[server] new message will be added to history:', clientMSG.chat);
 
-            var timestamp = Date.now();
-            var date = new Date(timestamp);
-            hours = date.getHours();
-            minutes = date.getMinutes();
+            let timestamp = Date.now();
+            let date = new Date(timestamp);
+            let year = date.getFullYear();
+            let month = date.getMonth() + 1; // months are zero-indexed, so add 1
+            let day = date.getDate();
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
 
-            messageHistory.push({ msg: clientMSG.chat, user: clientMSG.name, time: hours + ":" + minutes });
-            let msg = { content: clientMSG.chat, name: clientMSG.name, str: "addMessage", time: hours + ":" + minutes, code: 201 }
-            console.log("[server] notifying all clients of new message")
+            messageHistory.push({ msg: clientMSG.chat, user: clientMSG.name, time: day + "/" + month + "/" + year + " " + hours + ":" + minutes });
+            let msg = { content: clientMSG.chat, name: clientMSG.name, str: "addMessage", time: day + "/" + month + "/" + year + " " + hours + ":" + minutes, code: 201 };
+            console.log("[server] notifying all clients of new message: " + JSON.stringify(msg));
             broadcastMessage(msg, socket);
 
         } else if (clientMSG.str === 'deleteClient') {
