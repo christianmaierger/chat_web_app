@@ -5,16 +5,43 @@ let userNameLi;
 let nameButtonListener;
 
 
+
 function connect() {
     try {
-        ws = new WebSocket("ws://localhost:8080");
-        ws.onmessage = msg => handleMessage(msg);
-        setTimeout(initializeUserList, 100);
-        enableButton(document.getElementById("btnJoin")); 
-    } catch (error) {
+        const port = document.getElementById("port").value;
+        const host = document.getElementById("host").value;
+        let hostRegex = /^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}$/;
+        let host2Regex= /^[a-zA-Z]+$/;
+        let portRegex = /^[0-9]+$/;
+        let valid = true;
+        
+        if (!host.match(hostRegex) && !host.match(host2Regex) ) {
+            console.log(host)
+            document.getElementById("host").value = "Invalid host name. Please enter a valid host name.";
+            valid = false;
+        } 
+        if (!port.match(portRegex)) {
+            console.log(port)
+            document.getElementById("port").value ="Invalid port number. Please enter a valid port number.";
+            valid = false;
+        } 
+        if (valid ==true) {
+            
+            let connectionString="ws://"+ host +":"+ port;
+            ws = new WebSocket(connectionString);
+            ws.onmessage = msg => handleMessage(msg);
+            setTimeout(initializeUserList, 100);
+        } else {
+            alert("Port or Host not in wright format")
+        }
+       
+    } catch (e) {
         alert("Unfortunatelly an error connecting occured - Server might not be running properly right now");
+        console.log(e);
     }
 }
+
+
 
 function disconnect() {
 
@@ -38,55 +65,59 @@ function disconnect() {
 
 
 function initializeUserList() {
-
     const msg = { str: "init", name: userName };
     ws.send(JSON.stringify(msg));
+    disableButton(document.getElementById("btnSubmit"))
+    enableButton(document.getElementById("btnJoin")); 
 }
 
 // elem is the element/btn triggering the function
 function sendAndAddUser(elem) {
+    if (document.getElementById("btnJoin").classList.contains("button_disabled")) {
+        // if user is not allowed to send messages, because not logged in or something else, do nothing
+    } else {
 
     userName = document.getElementById('chatname').value;
-
     let listItem = document.createElement('li');
     listItem.innerHTML = userName.trim();
 
 
-    if ( (userNameList.length != 0 && userNameList.includes(userName)) || userName === "") {
-        console.log("Sry UserName is already used or empty, choose another");
+        if ( (userNameList.length != 0 && userNameList.includes(userName)) || userName === "") {
+            console.log("Sry UserName is already used or empty, choose another");
 
-        // event listener muss wieder erzeugt werden, da er immer nur einmal funktioniert, damit der button dann dissabled ist
-        nameButtonListener = document.getElementById('btnJoin').addEventListener('click', (event) => { sendAndAddUser(event.target) }, { once: true });
-    } else {
-        // save elem with username to delete it easily when disconnecting
-        userNameLi = document.getElementById('memberList').appendChild(listItem);
-        console.log(" this is elem/btn: " + elem);
+            // event listener muss wieder erzeugt werden, da er immer nur einmal funktioniert, damit der button dann dissabled ist
+            nameButtonListener = document.getElementById('btnJoin').addEventListener('click', (event) => { sendAndAddUser(event.target) }, { once: true });
+        } else {
+            // save elem with username to delete it easily when disconnecting
+            userNameLi = document.getElementById('memberList').appendChild(listItem);
+            console.log(" this is elem/btn: " + elem);
 
-        userNameLi.setAttribute("id", elem);
+            userNameLi.setAttribute("id", elem);
 
-        // festhalten genau der Name ist vergeben
-        userNameList.push(userName);
+            // festhalten genau der Name ist vergeben
+            userNameList.push(userName);
 
-        // print new user to console, server must push this to all clients
-        document.getElementById("chat").value += "\nA new user named " + userName + " joined the chat";
+            // print new user to console, server must push this to all clients
+            document.getElementById("chat").value += "\nA new user named " + userName + " joined the chat";
 
-        // send an object containing message and userName
-        const msg = { str: "newClient", name: userName };
+            // send an object containing message and userName
+            const msg = { str: "newClient", name: userName };
 
-        // msg has to be serialized, I use build in JSON Support for that
-        ws.send(JSON.stringify(msg));
+            // msg has to be serialized, I use build in JSON Support for that
+            ws.send(JSON.stringify(msg));
 
-        //Join Chat button will be graphically disabled
-        disableButton(elem);
+            //Join Chat button will be graphically disabled
+            disableButton(elem);
 
-        //Leave Chat Button becomes visible
-        document.getElementById("btnLeave").classList.remove("hidden");
+            //Leave Chat Button becomes visible
+            document.getElementById("btnLeave").classList.remove("hidden");
 
-        setTimeout(document.getElementById('chatname').value = "", 1000);
+            //setTimeout(document.getElementById('chatname').value = "", 1000);
 
-        //make msgButton look enabled
-        enableButton(document.getElementById("msgButton"));
-    }
+            //make msgButton look enabled
+            enableButton(document.getElementById("msgButton"));
+        }
+    }   
 }
 
 function showAndSendMessage() {
@@ -98,8 +129,9 @@ function showAndSendMessage() {
 
     chatMSG = chatMSG.trim();
     // append msg to chatArea
-    document.getElementById("chat").value += "\n" + userName + ": " + chatMSG;
-
+    
+    document.getElementById("chat").value += "\n" + "(YOU) " + userName + ": " + chatMSG;  
+    
     const msg = { str: "newMessage", name: userName, chat: chatMSG };
     // msg has to be serialized, I use build in JSON Support for that
     ws.send(JSON.stringify(msg));
@@ -113,7 +145,7 @@ function disableButton(elem) {
 }
 
 function enableButton(elem) {
-    console.log(elem);
+    console.log("enable called on: " + elem);
     elem.classList.remove("button_disabled");
 }
 
@@ -177,13 +209,15 @@ function handleMessage(msg) {
 
         let elem = document.getElementById(msg.name);
         elem.parentElement.removeChild(elem);
+        document.getElementById("chat").value += "\nUser named " + clientMSG.name + " left the chat";
     }
 }
 
 // this happens at startup
-document.addEventListener("DOMContentLoaded", connect);
+//document.addEventListener("DOMContentLoaded", connect);
 document.getElementById('btnJoin').addEventListener('click', (event) => { sendAndAddUser(event.target) }, { once: true });
 document.getElementById('msgButton').addEventListener('click', showAndSendMessage);
+document.getElementById('btnSubmit').addEventListener("click", connect);
 
 
 // event listeners for chatname and message field, so hitting enter will trigger sending of the input string
@@ -198,6 +232,7 @@ document.getElementById('chatname').addEventListener("keydown", function(event) 
         setTimeout(document.getElementById('chatname').value = "", 1000);
     }
 });
+
 
 document.getElementById('message').addEventListener("keydown", function(event) {
     // Number 13 is the "Enter" key on the keyboard

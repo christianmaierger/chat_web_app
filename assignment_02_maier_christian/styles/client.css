@@ -67,6 +67,10 @@ input {
     border-bottom: solid 1px;
 }
 
+#host {
+    border-right: solid 1px;
+}
+
 label {
     display: inline-block;
     height: 40px;

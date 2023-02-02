@@ -28,8 +28,15 @@
     <div class="card">
         <label for="chatname"><i class="far fa-user"></i> Name</label>
         <input id="chatname" type="text" placeholder="Enter your name">
-        <button id="btnJoin"><i class="fas fa-sign-in-alt hidden"></i> Join Chat</button>
+        <button id="btnJoin" class="button_disabled"><i class="fas fa-sign-in-alt hidden"></i> Join Chat</button>
         <button id="btnLeave" class="hidden"><i class="fas fa-sign-out-alt"></i> Disconnect From Chat</button>
+        <div class="card">
+            <label for="host"><i class="fas fa-server"></i> Host</label>
+            <input id="host" type="text" placeholder="Enter host address">
+            <label for="port"><i class="fas fa-signal"></i> Port</label>
+            <input id="port" type="text" placeholder="Enter port number">
+            <button id="btnSubmit" class=""><i class="fas fa-paper-plane"></i> Submit</button>
+        </div>
     </div>
 
     <!-- Second section, including the textarea for the chat messages and the chat members list. Again, note the uniq ID assigned to each item! -->
@@ -49,10 +56,7 @@
         <input id="message" type="text" placeholder="Enter your message">
         <button id="msgButton" class="button_disabled"><i class="far fa-paper-plane"></i> Send message</button>
     </div>
-    <script src="scripts/client.js">
+     <script src="scripts/client.js">  
     </script>
-
-
 </body>
-
 </html>

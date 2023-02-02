@@ -1,8 +1,11 @@
+require('dotenv').config();
+
 // https://github.com/websockets/ws
 const WebSocket = require('ws');
-const port = 8080;
+const port = process.env.PORT || 8080;
+const host = process.env.HOST || "localhosti";
 // running on localhost:8080 for now
-const server = new WebSocket.Server({ clientTracking: true, port: port });
+const server = new WebSocket.Server({ clientTracking: true, host: host, port: port });
 // names and adresses of users
 let clientMap = new Map();
 // list to help with only storing names of current users
@@ -50,8 +53,9 @@ server.on('connection', (socket, request) => {
             let hours = date.getHours();
             let minutes = date.getMinutes();
 
-            messageHistory.push({ msg: clientMSG.chat, user: clientMSG.name, time: day + "/" + month + "/" + year + " " + hours + ":" + minutes });
+            
             let msg = { content: clientMSG.chat, name: clientMSG.name, str: "addMessage", time: day + "/" + month + "/" + year + " " + hours + ":" + minutes, code: 201 };
+            messageHistory.push({ msg: clientMSG.chat, user: clientMSG.name, time: day + "/" + month + "/" + year + " " + hours + ":" + minutes });
             console.log("[server] notifying all clients of new message: " + JSON.stringify(msg));
             broadcastMessage(msg, socket);
 
@@ -62,7 +66,7 @@ server.on('connection', (socket, request) => {
             clientMap.delete(socket.clientPort);
             // make current memberList
             currentUsers = Array.from(clientMap, ([name, value]) => (value));
-
+            messageHistory.push(msg);
             let msg = { name: clientMSG.name, str: "deleteClient", code: 200 }
             console.log("[server] notifying all clients of disconnected client")
             broadcastMessage(msg, socket);

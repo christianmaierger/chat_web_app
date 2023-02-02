@@ -11,12 +11,10 @@
   "author": "Tony from Bamberg HCI chair and Christian Maier",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.0.3",
     "ws": "^7.2.3"
   },
   "devDependencies": {
     "open-cli": "^7.1.0"
   }
 }
-
-
-  
