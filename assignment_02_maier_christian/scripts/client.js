@@ -3,9 +3,28 @@ let ws = null;
 let userName;
 let userNameLi;
 let nameButtonListener;
+let port;
+
+// when html is fully loaded after being sent by express server, get host and port for server 
+// and add them automatically to html input fields to connect to ws chat
+addEventListener('DOMContentLoaded', (event) => {
+    var currentHost = window.location.host;
+    const Http = new XMLHttpRequest();
+    const url = "http://" + currentHost + "/port";
+    Http.open("GET", url);
+    //Http.withCredentials = true;
+    Http.send();
+
+    Http.onreadystatechange = (e) => {
+      console.log(Http.responseText)
+      port = Http.responseText;
+      document.getElementById("port").value=port;
+      document.getElementById("host").value=window.location.hostname;
+    }
+});
 
 
-
+// connect to ws on host and port from the html input fields, method also does simple check for valid values
 function connect() {
     try {
         const port = document.getElementById("port").value;
@@ -64,7 +83,7 @@ function disconnect() {
     ws.send(JSON.stringify(msg));
 }
 
-
+// initially get the lit of current users
 function initializeUserList() {
     const msg = { str: "init", name: userName };
     try {
@@ -219,7 +238,6 @@ function handleMessage(msg) {
 }
 
 // this happens at startup
-//document.addEventListener("DOMContentLoaded", connect);
 document.getElementById('btnJoin').addEventListener('click', (event) => { sendAndAddUser(event.target) }, { once: true });
 document.getElementById('msgButton').addEventListener('click', showAndSendMessage);
 document.getElementById('btnSubmit').addEventListener("click", connect);

@@ -1,14 +1,18 @@
 require('dotenv').config();
-
-
-
+const wsPort = process.env.PORT || 8080;
+const expressPort = process.env.PORTEXPRESS || 3000;
+//const host = process.env.HOST || "localhost";
+const cors = require('cors');
+const corsOptions = {
+    origin: '*',
+    optionsSuccessStatus: 200
+  };
 const path = require('path');
 var express = require('express')
 var app = express()
-//app.use( "styles/client.css" ,express.static(path.join(__dirname,'../styles/client.css')));
-//app.use( "scripts/client.js" ,express.static(path.join(__dirname,'/client.js')));
-//app.use('/test', express.static(path.join(__dirname,'../../public/')));
+app.use(cors(corsOptions));
 
+// send static files to client that makes a http request to host:port/index - default localhost:3000/index
 app.use('/scripts/client.js' , (req,res,next)=>{
     res.sendFile(path.join(__dirname,'/client.js'));
     });
@@ -18,29 +22,41 @@ app.use('/styles/client.css' , (req,res,next)=>{
  app.use('/img/logo_mci_hci_200x96.png' , (req,res,next)=>{
     res.sendFile(path.join(__dirname,'../img/logo_mci_hci_200x96.png'));
     });
-app.use('/' , (req,res,next)=>{
+app.use('/index' , (req,res,next)=>{
 res.sendFile(path.join(__dirname,'../client.html'));
 });
-app.listen(3000, function () {
-   console.log('Example app listening on port 3000!')
+
+
+
+// send the client the port number to connect to ws for chat
+app.get('/port', (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.send(wsPort);
+});
+
+
+// if run in docker container plese make sure the exposed port for the express server is mapped to the one the server in the container listens on
+app.listen(expressPort, function () {
+   console.log('Express is listening on port 3000 and will send static files to clients!')
 })
 
 
 // https://github.com/websockets/ws
+// will handle chat communication with clients
 const WebSocket = require('ws');
-const port = process.env.PORT || 8080;
-//const host = process.env.HOST || "localhost";
-// running on localhost:8080 for now
-const server = new WebSocket.Server({ clientTracking: true, port: port });
+
+// running on localhost:8080 for now 
+const server = new WebSocket.Server({ clientTracking: true, port: wsPort });
 
 // names and adresses of users
 let clientMap = new Map();
 // list to help with only storing names of current users
 let currentUsers = [];
-// complete history of all messanges
+// complete history of all messages
 let messageHistory = [];
 
-server.on('listening', () => console.log('> server running on port ' + port));
+// server will on default lsiten on port 8080 for clients connecting to the chat
+server.on('listening', () => console.log('> server running on port ' + wsPort));
 
 server.on('error', (e) => console.log(" [server]: an error occured: " + e ) )
 
