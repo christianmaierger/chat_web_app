@@ -1,5 +1,31 @@
 require('dotenv').config();
 
+
+
+const path = require('path');
+var express = require('express')
+var app = express()
+//app.use( "styles/client.css" ,express.static(path.join(__dirname,'../styles/client.css')));
+//app.use( "scripts/client.js" ,express.static(path.join(__dirname,'/client.js')));
+//app.use('/test', express.static(path.join(__dirname,'../../public/')));
+
+app.use('/scripts/client.js' , (req,res,next)=>{
+    res.sendFile(path.join(__dirname,'/client.js'));
+    });
+app.use('/styles/client.css' , (req,res,next)=>{
+    res.sendFile(path.join(__dirname,'../styles/client.css'));
+    });
+ app.use('/img/logo_mci_hci_200x96.png' , (req,res,next)=>{
+    res.sendFile(path.join(__dirname,'../img/logo_mci_hci_200x96.png'));
+    });
+app.use('/' , (req,res,next)=>{
+res.sendFile(path.join(__dirname,'../client.html'));
+});
+app.listen(3000, function () {
+   console.log('Example app listening on port 3000!')
+})
+
+
 // https://github.com/websockets/ws
 const WebSocket = require('ws');
 const port = process.env.PORT || 8080;

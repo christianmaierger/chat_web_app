@@ -31,6 +31,9 @@ npm install
 
 npm audit fix (optional)
 ```
+Please in case of assignment_02_maier_christian do this for both client and server in folders:
+assignment_02_maier_christian/client and assignment_02_maier_christian/server
+
 ### Executing program
 
 For the server put host/port in the .env file, default is localhost and 8080
@@ -46,14 +49,18 @@ For Client in Browser just use host and port, default "localhost" and "8080"
 
 ### Executing with Docker
 
-The faster way is just running the Server as Docker container with:
+The faster way to run assignment_02 is just running the Server as Docker container with:
 
 ```
 ./build.sh 
 ./run.sh
 ```
 
-That will build an image named websockets and run a container from it with ports mapped: 8080 to 8080
+That will build an image named websockets and run a container from it with ports mapped: 8080 to 8080 (for ws) and 3000 to 3000
+(for sending the static files to client with express)
+By changing the scripts you could also change naming and ports, but keep in mind to also change port in Dockerfile.
+
+In browser open url: localhost:3000
 
 ## Help
 
@@ -63,4 +70,3 @@ Please get in touch if you need any help or advice.
 
 ex. Tony Malzhacker (University HCI Chair)
 ex. Christian Maier (Implementing Student)
-
