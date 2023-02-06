@@ -3,9 +3,10 @@ require('dotenv').config();
 // https://github.com/websockets/ws
 const WebSocket = require('ws');
 const port = process.env.PORT || 8080;
-const host = process.env.HOST || "localhosti";
+//const host = process.env.HOST || "localhost";
 // running on localhost:8080 for now
-const server = new WebSocket.Server({ clientTracking: true, host: host, port: port });
+const server = new WebSocket.Server({ clientTracking: true, port: port });
+
 // names and adresses of users
 let clientMap = new Map();
 // list to help with only storing names of current users
@@ -15,10 +16,12 @@ let messageHistory = [];
 
 server.on('listening', () => console.log('> server running on port ' + port));
 
+server.on('error', (e) => console.log(" [server]: an error occured: " + e ) )
+
 server.on('connection', (socket, request) => {
     // when connection is set, get the port the individual client connetcted to
     let clientPort = request.socket.remotePort;
-    console.log(`[server] new client connected from port ${clientPort}`);
+    console.log(`[server] new client connected with adress: ${clientPort}`);
 
     socket.on('message', (msg) => {
         //deserialize JSON to an normal obj

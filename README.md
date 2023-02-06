@@ -44,6 +44,17 @@ npm run start-client (to start up client in browser)
 For Client in Browser just use host and port, default "localhost" and "8080"
 
 
+### Executing with Docker
+
+The faster way is just running the Server as Docker container with:
+
+```
+./build.sh 
+./run.sh
+```
+
+That will build an image named websockets and run a container from it with ports mapped: 8080 to 8080
+
 ## Help
 
 Please get in touch if you need any help or advice.

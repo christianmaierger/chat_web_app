@@ -10,15 +10,15 @@ function connect() {
     try {
         const port = document.getElementById("port").value;
         const host = document.getElementById("host").value;
-        let hostRegex = /^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}$/;
-        let host2Regex= /^[a-zA-Z]+$/;
+        let hostRegex = /\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/;
+      
         let portRegex = /^[0-9]+$/;
         let valid = true;
         
-        if (!host.match(hostRegex) && !host.match(host2Regex) ) {
-            console.log(host)
-            document.getElementById("host").value = "Invalid host name. Please enter a valid host name.";
-            valid = false;
+        if ( !host.match(hostRegex) && !host.match("localhost") ) {
+           console.log(host)
+           document.getElementById("host").value = "Invalid host name. Please enter a valid host name.";
+           valid = false;
         } 
         if (!port.match(portRegex)) {
             console.log(port)
@@ -28,9 +28,10 @@ function connect() {
         if (valid ==true) {
             
             let connectionString="ws://"+ host +":"+ port;
+          
             ws = new WebSocket(connectionString);
             ws.onmessage = msg => handleMessage(msg);
-            setTimeout(initializeUserList, 100);
+            setTimeout(initializeUserList, 500);
         } else {
             alert("Port or Host not in wright format")
         }
@@ -66,9 +67,13 @@ function disconnect() {
 
 function initializeUserList() {
     const msg = { str: "init", name: userName };
+    try {
     ws.send(JSON.stringify(msg));
     disableButton(document.getElementById("btnSubmit"))
     enableButton(document.getElementById("btnJoin")); 
+     } catch (e) {
+        throw e; 
+     }
 }
 
 // elem is the element/btn triggering the function
